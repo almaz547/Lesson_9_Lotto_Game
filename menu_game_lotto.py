@@ -41,8 +41,7 @@ while motion == '':
                 if choice_bag == 'u':
                     print(f'Бачонок №  {bag_mot} из карты  {gamer.name[0]}.{gamer.name[1]}   Удален !')
                 else:
-                    print(
-                        f'Вы   {gamer.name[0]}.{gamer.name[1]}   проиграли ! Бачонок №  {bag_mot} в вашей карте есть !')
+                    print(f'Вы   {gamer.name[0]}.{gamer.name[1]}   проиграли ! Бачонок №  {bag_mot} в вашей карте есть !')
                     list_players.remove(gamer)
         else:
             if gamer.name[2]:
