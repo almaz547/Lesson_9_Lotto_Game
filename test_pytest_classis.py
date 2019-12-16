@@ -8,6 +8,17 @@ class TestBag:
         assert bag.game_bag == list(range(1, 91))
         assert bag.numer_motion == 0
 
+    def test___str__(self):
+        bag = Bag()
+        assert str(bag) == str(bag.game_bag)
+
+    def test___eq__(self):
+        bag = Bag()
+        bag_test = Bag()
+        if isinstance(bag_test, Bag):
+            assert isinstance(bag_test, Bag)
+            assert len(bag.game_bag) == len(bag_test.game_bag)
+
     def test_out_tank(self):
         bag = Bag()
         if bag.game_bag:
@@ -36,6 +47,8 @@ class TestCard():
         assert card.name == 'max'
         assert card.is_there_barrel == 0
         assert card.victory == False
+        assert card.text_card == ''
+        assert card.remove_number == 0
 
         assert len(card.numbers) == 15
         number_max = 0
@@ -53,6 +66,21 @@ class TestCard():
                 assert number in card.len_line
                 assert not number not in card.len_line
 
+    def test___str__(self):
+        card = Card(1, 'max')
+        assert str(card) == str(card.text_card)
+
+    def test___eq__(self):
+        card = Card(1, 'max')
+        test_card = Card(0, 'robot')
+        if isinstance(test_card, Card) and isinstance(card, Card):
+            assert isinstance(test_card, Card) and isinstance(card, Card)
+            assert len(card.numbers) == len(card.numbers)
+            for element in card.numbers:
+                assert isinstance(element, int or None)
+            for element in test_card.numbers:
+                assert isinstance(element, int or None)
+
     def test_delete_number(self):
         card = Card(1, 'max')
         bag_class = Bag()
@@ -65,6 +93,10 @@ class TestCard():
                 assert bag not in bag_class.game_bag
                 assert card.numbers[x] == None
                 assert card.is_there_barrel == True
+                if card.remove_number >= 15:
+                    assert card.victory == True
+                else:
+                    assert card.victory == False
             else:
                 assert bag not in bag_class.game_bag
                 card.delete_number(bag)
@@ -92,24 +124,10 @@ class TestCard():
                         assert number in card.list_full_position[i]
                         assert len(card.list_full_position) == 3
                         assert len(card.list_full_position[i]) == 5
-                        if card.numbers[y] == None:
-                            x += 1
-                            assert text_card + f'--  '
-                            if x >= 15:
-                                assert card.victory == True
-                            assert x <= 15
-                            y += 1
-                        elif card.numbers[y] > 9:
-                            assert text_card + f'{card.numbers[y]}  '
-                            y += 1
-                        else:
-                            assert text_card + f' {card.numbers[y]}  '
-                            y += 1
                     else:
                         assert not number in card.list_full_position[i]
-                        assert text_card + '    '
-                assert text_card + '\n'
-                assert text_card + ('-' * 35)
+
+
 
 
 class TestPlayer():
@@ -123,8 +141,56 @@ class TestPlayer():
         assert player.card == player.card
         assert player.decision == None
 
-    def test_action_player(self):
+    def test___str__(self):
+        players = [Player(num_player=1, name='max', type_player=1), Robot(num_player=2, name='mix', type_player=0)]
+        for player in players:
+            if player.type_player:
+                assert player.type_player == True
+                assert player.name == 'max'
+                assert player.num_player == 1
+                assert str(player) == 'Участник № 1 по имени -- max-(Человек)'
+            else:
+                assert player.type_player == False
+                assert player.name == 'mix'
+                assert player.num_player == 2
+                assert str(player) == 'Участник № 2 по имени -- mix-(Робот)'
 
+    def test___eq__(self):
+        player = Player(1, 'max', 1)
+        player_2 = Robot(2, 'mix', 0)
+        if isinstance(player_2, Player or Robot) and isinstance(player, Player or Robot):
+            assert isinstance(player, Player or Robot)
+            assert isinstance(player_2, Player or Robot) == True
+            assert isinstance(player.card.remove_number, int)
+            assert isinstance(player_2.card.remove_number, int)
+        else:
+            assert 'Сравнение невозможно !'
+
+    def test___gt__(self):             # Больше
+        player = Player(1, 'max', 1)
+        player_2 = Robot(2, 'mix', 0)
+        player.card.remove_number = 5
+        player_2.card.remove_number = 4
+        if isinstance(player_2, Player or Robot) and isinstance(player, Player or Robot):
+            assert isinstance(player, Player or Robot)
+            assert isinstance(player_2, Player or Robot)
+            assert player.card.remove_number > player_2.card.remove_number
+        else:
+            assert 'Сравнение невозможно !'
+
+    def test___lt__(self):   # Меньше
+        player = Player(1, 'max', 1)
+        player_2 = Robot(2, 'mix', 0)
+        player.card.remove_number = 4
+        player_2.card.remove_number = 5
+        if isinstance(player_2, Player or Robot) and isinstance(player, Player or Robot):
+            assert isinstance(player, Player or Robot)
+            assert isinstance(player_2, Player or Robot)
+            assert player.card.remove_number < player_2.card.remove_number
+        else:
+            assert 'Сравнение невозможно !'
+
+    def test_action_player(self):
         player = Player(num_player=1, name='max', type_player=1)
         bag_test = Bag()
         player.card = Card(num_player=1, name='max')

@@ -1,4 +1,4 @@
-from classis import Player, Robot
+from classis import Player, Robot, Card
 
 
 def huw_much_players():                        # Определяем количество игроков
@@ -25,5 +25,12 @@ def number_name_type_player(len_players):  # Вводим номер имя и �
         player = Player(i + 1, name, type_player) if type_player else Robot(i + 1, name, type_player)
         list_players.append(player)
     return list_players
+
+
+def comparison_remove_numbers(list_players):            # Анализ игры по закрытым номерам
+    list_players.sort(reverse=True)        # Сортеруем игроков по количеству зачеркнутых номеров в порядке убывания
+    for player in list_players:
+        print(f'Закрытых номеров: ---  {player.card.remove_number}  --- у {player} ')
+
 
 

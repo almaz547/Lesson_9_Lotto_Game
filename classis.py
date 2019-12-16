@@ -5,6 +5,13 @@ class Bag:
         self.game_bag = list(range(1, 91))              # Содержимое мешка
         self.numer_motion = 0                           #  Номер хода
 
+    def __str__(self):
+        return str(self.game_bag)
+
+    def __eq__(self, other):
+        if isinstance(other, Bag):
+            return len(self.game_bag) == len(other.game_bag)
+
     def out_tank(self):                                               # Достать один бачонок
         if self.game_bag:
             self.numer_motion += 1
@@ -26,6 +33,8 @@ class Card():
         self.num_player = num_player
         self.is_there_barrel = False        # Есть ли такая бочка в номерах карты
         self.victory = False
+        self.text_card = ''
+        self.remove_number = 0          # Счетчик удаленных номеров в карте
                                                                 # Выбрать 15 цифр для карточки
         self.numbers = random.sample(range(1, 91), 15)                # Ряд цифр для карточки
         self.numbers.sort()                                           # Ряд цифр для карточки по порядку
@@ -35,43 +44,52 @@ class Card():
             full_line_position.sort()                                  # Номера позиций для заполнения цифрами линии по порядку
             self.list_full_position.append(full_line_position)
 
+    def __str__(self):
+        return self.text_card
+
+    def __eq__(self, other):
+        if isinstance(other, Card):
+            return self.numbers == other.numbers
+
 
     def delete_number(self, bag):                       # Удаляем номер из списка для карточки
         if bag in self.numbers:
             x = self.numbers.index(bag)
             self.numbers.remove(bag)
+            self.remove_number += 1
             self.numbers.insert(x, None)
             self.is_there_barrel = True
+            if self.remove_number >= 15:
+                self.victory = True
         else:
             self.is_there_barrel = False                 # Есть ли такая бочка в номерах карты
 
 
 
     def fill_cart(self):                            # Заполняем карточку
+        self.text_card = ''
         y = 0                                            # Определяем порядковый индекс для  15-ти цифр в карточке
         x = 0                                       # Счетчик зачеркнутых номеров
-        text_card = '\n'
-        text_card += f'----------Игрок:   {self.num_player}.{self.name}   --------\n'
+        self.text_card += '\n'
+        self.text_card += f'----------Игрок № {self.num_player} -{self.name}   --------\n'
         for i in range(3):
             for number in self.len_line:                               # Проходим по 9 позициям в линии
                 if number in self.list_full_position[i]:                # Если позиция совпадает с номером для записи
                     if self.numbers[y] == None:
                         x += 1
-                        text_card += f'--  '
-                        if x >= 15:
-                            self.victory = True
+                        self.text_card += f'--  '
                         y += 1
                     elif self.numbers[y] > 9:
-                        text_card += f'{self.numbers[y]}  '              # Записываем в нее цифру по индексу
+                        self.text_card += f'{self.numbers[y]}  '              # Записываем в нее цифру по индексу
                         y += 1                                      # Переключаем счетчик индекса 15-ти цифр карточки
                     else:
-                        text_card += f' {self.numbers[y]}  '
+                        self.text_card += f' {self.numbers[y]}  '
                         y += 1
                 else:
-                    text_card += '    '                      # На остальных четырех пустых позициях печатаем пробел
-            text_card += '\n'
-        text_card += ('-' * 35)
-        return text_card
+                    self.text_card += '    '                      # На остальных четырех пустых позициях печатаем пробел
+            self.text_card += '\n'
+        self.text_card += ('-' * 35)
+        return self.text_card
 
 
 class Player():
@@ -81,6 +99,33 @@ class Player():
         self.type_player = type_player
         self.card = Card(num_player, name)
         self.decision = None
+
+    def __str__(self):
+        if self.type_player:
+            name_type_player = 'Человек'
+        else:
+            name_type_player = 'Робот'
+        return f'Участник № {self.num_player} по имени -- {self.name}-({name_type_player})'
+
+    def __eq__(self, other):
+        if isinstance(other, Player or Robot):
+            return self.card.remove_number == other.card.remove_number
+        elif isinstance(other, int):
+            return self.card.remove_number == other
+        else:
+            return 'Сравнение невозможно !'
+
+    def __gt__(self, other):            # Больше
+        if isinstance(other, Player or Robot):
+            return self.card.remove_number > other.card.remove_number
+        else:
+            return 'Сравнение невозможно !'
+
+    def __lt__(self, other):   # Меньше
+        if isinstance(other, Player or Robot):
+            return self.card.remove_number < other.card.remove_number
+        else:
+            return 'Сравнение невозможно !'
 
 
     def action_player(self, bag, request):
